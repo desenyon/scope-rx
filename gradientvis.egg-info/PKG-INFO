@@ -1,3 +1,16 @@
+Metadata-Version: 2.1
+Name: gradientvis
+Version: 0.5.0
+Summary: A library for visualizing neural network gradients
+Home-page: https://github.com/desenyon/gradientvis
+Author: XCALEN
+Author-email: desenyon@gmail.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+
 # GradientVis
 
 **GradientVis** is a Python library designed for visualizing neural network gradients, aimed at helping researchers and developers better interpret the inner workings of deep learning models. It includes various gradient visualization methods such as **GradCAM**, **SmoothGrad**, and **Integrated Gradients** making model interpretation easier.
