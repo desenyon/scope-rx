@@ -1,0 +1,161 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scope-rx"
+version = "1.0.0"
+description = "A comprehensive neural network explainability and interpretability library"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "XCALEN", email = "desenyon@gmail.com"}
+]
+maintainers = [
+    {name = "XCALEN", email = "desenyon@gmail.com"}
+]
+keywords = [
+    "deep-learning",
+    "explainability",
+    "interpretability",
+    "neural-networks",
+    "pytorch",
+    "gradcam",
+    "integrated-gradients",
+    "shap",
+    "lime",
+    "attention",
+    "xai",
+    "machine-learning",
+    "computer-vision",
+    "transformers"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Image Processing",
+    "Topic :: Scientific/Engineering :: Visualization",
+]
+requires-python = ">=3.8"
+dependencies = [
+    "torch>=1.10.0",
+    "numpy>=1.21.0",
+    "matplotlib>=3.5.0",
+    "opencv-python>=4.5.0",
+    "scipy>=1.7.0",
+    "pillow>=8.0.0",
+    "tqdm>=4.60.0",
+    "scikit-learn>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "flake8>=6.0.0",
+    "mypy>=1.0.0",
+    "pre-commit>=3.0.0",
+]
+interactive = [
+    "plotly>=5.10.0",
+    "ipywidgets>=8.0.0",
+    "jupyter>=1.0.0",
+]
+full = [
+    "shap>=0.42.0",
+    "lime>=0.2.0",
+    "captum>=0.6.0",
+    "torchvision>=0.12.0",
+    "transformers>=4.20.0",
+]
+docs = [
+    "sphinx>=6.0.0",
+    "sphinx-rtd-theme>=1.2.0",
+    "sphinx-autodoc-typehints>=1.22.0",
+    "myst-parser>=1.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/xcalen/scope-rx"
+Documentation = "https://scope-rx.readthedocs.io"
+Repository = "https://github.com/xcalen/scope-rx"
+Issues = "https://github.com/xcalen/scope-rx/issues"
+Changelog = "https://github.com/xcalen/scope-rx/blob/main/CHANGELOG.md"
+
+[project.scripts]
+scope-rx = "scope_rx.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["scope_rx*"]
+
+[tool.black]
+line-length = 100
+target-version = ["py38", "py39", "py310", "py311", "py312"]
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+strict_optional = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --cov=scope_rx --cov-report=term-missing"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::UserWarning",
+]
+
+[tool.coverage.run]
+source = ["scope_rx"]
+branch = true
+omit = ["tests/*", "setup.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+]
