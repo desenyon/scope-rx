@@ -1,0 +1,16 @@
+{
+    "include": ["scope_rx", "tests"],
+    "exclude": ["**/__pycache__", "**/*.egg-info"],
+    "typeCheckingMode": "basic",
+    "pythonVersion": "3.10",
+    "reportUnknownMemberType": "none",
+    "reportUnknownArgumentType": "none",
+    "reportUnknownParameterType": "none",
+    "reportUnknownVariableType": "none",
+    "reportMissingTypeStubs": "none",
+    "reportGeneralTypeIssues": "warning",
+    "reportOptionalMemberAccess": "warning",
+    "reportPrivateUsage": "warning",
+    "reportUnusedImport": "warning",
+    "reportUnusedVariable": "warning"
+}
