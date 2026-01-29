@@ -1,8 +1,39 @@
+# Virtual environments
 .venv/
+venv/
+env/
+
+# Python cache
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-gradientvs.egg-info/
+.Python
+
+# Egg info
+*.egg-info/
+*.egg
+
+# Build artifacts
 build/
 dist/
+
+# Coverage
+.coverage
+htmlcov/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Pytest
+.pytest_cache/
+
+# MyPy
+.mypy_cache/
