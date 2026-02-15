@@ -18,7 +18,7 @@ import torch.nn.functional as F
 if hasattr(np, "trapezoid"):
     _trapezoid = np.trapezoid
 else:
-    _trapezoid = getattr(np, "trapz")
+    _trapezoid = getattr(np, "trapz")  # noqa: B009
 
 
 def insertion_deletion_auc(
