@@ -5,6 +5,7 @@ This module provides the abstract base class that all explanation methods
 inherit from, ensuring a consistent interface across the library.
 """
 
+from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple

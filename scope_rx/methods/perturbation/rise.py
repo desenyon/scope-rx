@@ -5,7 +5,9 @@ Reference: "RISE: Randomized Input Sampling for Explanation of Black-box Models"
 https://arxiv.org/abs/1806.07421
 """
 
-from typing import Optional, Tuple
+from __future__ import annotations
+import math
+from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Union
 
 import numpy as np
 import torch

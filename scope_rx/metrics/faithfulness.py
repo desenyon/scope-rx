@@ -5,6 +5,7 @@ These metrics measure how faithfully an explanation reflects
 the model's decision process.
 """
 
+from __future__ import annotations
 from typing import Any, List, Optional, Tuple
 
 import numpy as np
