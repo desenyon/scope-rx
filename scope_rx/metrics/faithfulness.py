@@ -14,6 +14,12 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+# Handle numpy 2.0+ change
+if hasattr(np, "trapezoid"):
+    _trapezoid = np.trapezoid
+else:
+    _trapezoid = getattr(np, "trapz")
+
 
 def insertion_deletion_auc(
     model: nn.Module,
@@ -104,8 +110,8 @@ def insertion_deletion_auc(
 
     # Compute AUC using trapezoidal rule
     x = np.linspace(0, 1, len(insertion_scores))
-    insertion_auc = float(np.trapezoid(insertion_scores, x))
-    deletion_auc = float(np.trapezoid(deletion_scores, x))
+    insertion_auc = float(_trapezoid(insertion_scores, x))
+    deletion_auc = float(_trapezoid(deletion_scores, x))
 
     return insertion_auc, deletion_auc
 
