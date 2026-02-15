@@ -2,8 +2,8 @@
 Attribution postprocessing utilities.
 """
 
-import numpy as np
 import cv2
+import numpy as np
 
 
 def normalize_attribution(
@@ -11,36 +11,36 @@ def normalize_attribution(
     method: str = "minmax"
 ) -> np.ndarray:
     """Normalize attribution to [0, 1] range.
-    
+
     Args:
         attribution: Attribution map.
         method: Normalization method ('minmax', 'abs_max', 'percentile').
-        
+
     Returns:
         Normalized attribution.
     """
     if method == "minmax":
         attr_min, attr_max = attribution.min(), attribution.max()
         if attr_max - attr_min > 1e-8:
-            return (attribution - attr_min) / (attr_max - attr_min)
+            return (attribution - attr_min) / (attr_max - attr_min)  # type: ignore[no-any-return]
         else:
-            return np.zeros_like(attribution)
-    
+            return np.zeros_like(attribution)  # type: ignore[no-any-return]
+
     elif method == "abs_max":
         abs_max = np.abs(attribution).max()
         if abs_max > 1e-8:
-            return (attribution / abs_max + 1) / 2
+            return (attribution / abs_max + 1) / 2  # type: ignore[no-any-return]
         else:
-            return np.ones_like(attribution) * 0.5
-    
+            return np.ones_like(attribution) * 0.5  # type: ignore[no-any-return]
+
     elif method == "percentile":
         p_low, p_high = np.percentile(attribution, [2, 98])
         attribution = np.clip(attribution, p_low, p_high)
         if p_high - p_low > 1e-8:
-            return (attribution - p_low) / (p_high - p_low)
+            return (attribution - p_low) / (p_high - p_low)  # type: ignore[no-any-return]
         else:
-            return np.zeros_like(attribution)
-    
+            return np.zeros_like(attribution)  # type: ignore[no-any-return]
+
     else:
         raise ValueError(f"Unknown normalization method: {method}")
 
@@ -51,12 +51,12 @@ def smooth_attribution(
     sigma: float = 1.0
 ) -> np.ndarray:
     """Apply Gaussian smoothing to attribution.
-    
+
     Args:
         attribution: Attribution map.
         kernel_size: Gaussian kernel size.
         sigma: Gaussian sigma.
-        
+
     Returns:
         Smoothed attribution.
     """
@@ -64,7 +64,7 @@ def smooth_attribution(
         attribution.astype(np.float32),
         (kernel_size, kernel_size),
         sigma
-    )
+    )  # type: ignore[no-any-return]
 
 
 def threshold_attribution(
@@ -73,19 +73,19 @@ def threshold_attribution(
     method: str = "value"
 ) -> np.ndarray:
     """Threshold attribution map.
-    
+
     Args:
         attribution: Attribution map (should be normalized to [0, 1]).
         threshold: Threshold value or percentile.
         method: 'value' (absolute threshold) or 'percentile'.
-        
+
     Returns:
         Thresholded attribution (binary or clipped).
     """
     if method == "percentile":
         threshold = np.percentile(attribution, threshold * 100)
-    
-    return np.where(attribution >= threshold, attribution, 0)
+
+    return np.where(attribution >= threshold, attribution, 0)  # type: ignore[no-any-return]
 
 
 def upsample_attribution(
@@ -94,12 +94,12 @@ def upsample_attribution(
     interpolation: str = "bilinear"
 ) -> np.ndarray:
     """Upsample attribution to target size.
-    
+
     Args:
         attribution: Attribution map.
         target_size: Target (height, width).
         interpolation: Interpolation method.
-        
+
     Returns:
         Upsampled attribution.
     """
@@ -109,11 +109,11 @@ def upsample_attribution(
         "bicubic": cv2.INTER_CUBIC,
         "area": cv2.INTER_AREA,
     }
-    
+
     interp = interp_map.get(interpolation, cv2.INTER_LINEAR)
-    
+
     return cv2.resize(
         attribution.astype(np.float32),
         (target_size[1], target_size[0]),
         interpolation=interp
-    )
+    )  # type: ignore[no-any-return]

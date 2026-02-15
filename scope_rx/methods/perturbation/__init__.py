@@ -7,9 +7,9 @@ This module provides perturbation-based attribution methods including:
 - Meaningful Perturbation
 """
 
+from scope_rx.methods.perturbation.meaningful_perturbation import MeaningfulPerturbation
 from scope_rx.methods.perturbation.occlusion import OcclusionSensitivity
 from scope_rx.methods.perturbation.rise import RISE
-from scope_rx.methods.perturbation.meaningful_perturbation import MeaningfulPerturbation
 
 __all__ = [
     "OcclusionSensitivity",

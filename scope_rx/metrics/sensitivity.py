@@ -21,9 +21,9 @@ def sensitivity_score(
     **explainer_kwargs: Any
 ) -> float:
     """Compute average sensitivity of explanations to input noise.
-    
+
     Lower sensitivity = more stable explanations.
-    
+
     Args:
         explainer: Explanation method instance.
         input_tensor: Input tensor.
@@ -31,7 +31,7 @@ def sensitivity_score(
         num_samples: Number of noisy samples to test.
         noise_level: Standard deviation of noise.
         **explainer_kwargs: Additional arguments for explainer.
-        
+
     Returns:
         Average sensitivity score (lower = more stable).
     """
@@ -40,24 +40,24 @@ def sensitivity_score(
         input_tensor, target_class=target_class, **explainer_kwargs
     )
     original_attr = original_result.normalized_attribution
-    
+
     sensitivities = []
-    
+
     for _ in range(num_samples):
         # Add noise
         noise = torch.randn_like(input_tensor) * noise_level
         noisy_input = input_tensor + noise
-        
+
         # Get noisy explanation
         noisy_result = explainer.explain(
             noisy_input, target_class=target_class, **explainer_kwargs
         )
         noisy_attr = noisy_result.normalized_attribution
-        
+
         # Compute L2 distance
         distance = np.sqrt(np.mean((original_attr - noisy_attr) ** 2))
         sensitivities.append(distance)
-    
+
     return float(np.mean(sensitivities))
 
 
@@ -70,7 +70,7 @@ def max_sensitivity(
     **explainer_kwargs: Any
 ) -> float:
     """Compute maximum sensitivity of explanations to input noise.
-    
+
     Args:
         explainer: Explanation method instance.
         input_tensor: Input tensor.
@@ -78,7 +78,7 @@ def max_sensitivity(
         num_samples: Number of noisy samples to test.
         noise_level: Standard deviation of noise.
         **explainer_kwargs: Additional arguments for explainer.
-        
+
     Returns:
         Maximum sensitivity score.
     """
@@ -86,21 +86,21 @@ def max_sensitivity(
         input_tensor, target_class=target_class, **explainer_kwargs
     )
     original_attr = original_result.normalized_attribution
-    
+
     max_distance = 0.0
-    
+
     for _ in range(num_samples):
         noise = torch.randn_like(input_tensor) * noise_level
         noisy_input = input_tensor + noise
-        
+
         noisy_result = explainer.explain(
             noisy_input, target_class=target_class, **explainer_kwargs
         )
         noisy_attr = noisy_result.normalized_attribution
-        
+
         distance = np.sqrt(np.mean((original_attr - noisy_attr) ** 2))
         max_distance = max(max_distance, distance)
-    
+
     return max_distance
 
 

@@ -23,26 +23,26 @@ def main():
 Examples:
   # Generate a GradCAM explanation
   scope-rx explain image.jpg --model resnet50 --method gradcam --output heatmap.png
-  
+
   # Compare multiple methods
   scope-rx compare image.jpg --model resnet50 --methods gradcam,smoothgrad,ig
-  
+
   # List available methods
   scope-rx list-methods
-  
+
   # Show model layers (for layer selection)
   scope-rx show-layers --model resnet50
 """
     )
-    
+
     parser.add_argument(
         "--version", "-v",
         action="store_true",
         help="Show version"
     )
-    
+
     subparsers = parser.add_subparsers(dest="command")
-    
+
     # Explain command
     explain_parser = subparsers.add_parser(
         "explain",
@@ -85,7 +85,7 @@ Examples:
         action="store_true",
         help="Don't display the result"
     )
-    
+
     # Compare command
     compare_parser = subparsers.add_parser(
         "compare",
@@ -118,13 +118,13 @@ Examples:
         action="store_true",
         help="Don't display the result"
     )
-    
+
     # List methods
     subparsers.add_parser(
         "list-methods",
         help="List available explanation methods"
     )
-    
+
     # Show layers
     layers_parser = subparsers.add_parser(
         "show-layers",
@@ -135,14 +135,14 @@ Examples:
         required=True,
         help="Model name"
     )
-    
+
     args = parser.parse_args()
-    
+
     if args.version:
         from scope_rx import __version__
         print(f"ScopeRX v{__version__}")
         return 0
-    
+
     if args.command == "explain":
         return cmd_explain(args)
     elif args.command == "compare":
@@ -160,24 +160,25 @@ def cmd_explain(args):
     """Handle explain command."""
     try:
         import torch
+
         from scope_rx import ScopeRX
-        from scope_rx.utils import preprocess_image, load_image
-        from scope_rx.visualization import plot_attribution, export_visualization
-        
+        from scope_rx.utils import load_image, preprocess_image
+        from scope_rx.visualization import export_visualization, plot_attribution
+
         # Load model
         model = load_model(args.model)
-        
+
         # Load and preprocess image
         original_image = load_image(args.image, size=(224, 224))
         input_tensor = preprocess_image(args.image)
-        
+
         # Ensure tensor type
         if not isinstance(input_tensor, torch.Tensor):
             input_tensor = torch.from_numpy(input_tensor).float()
-        
+
         # Create explainer
         scope = ScopeRX(model)
-        
+
         # Generate explanation
         result = scope.explain(
             input_tensor,
@@ -185,11 +186,11 @@ def cmd_explain(args):
             target_class=args.target_class,
             target_layer=args.layer
         )
-        
+
         print(f"Method: {args.method}")
         print(f"Target class: {result.target_class}")
         print(f"Attribution shape: {result.attribution.shape}")
-        
+
         # Visualize
         if args.output:
             export_visualization(
@@ -199,7 +200,7 @@ def cmd_explain(args):
                 image=original_image
             )
             print(f"Saved to: {args.output}")
-        
+
         if not args.no_display:
             plot_attribution(
                 result.attribution,
@@ -207,9 +208,9 @@ def cmd_explain(args):
                 title=args.method.replace('_', ' ').title(),
                 colormap=args.colormap
             )
-        
+
         return 0
-        
+
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         return 1
@@ -219,39 +220,40 @@ def cmd_compare(args):
     """Handle compare command."""
     try:
         import torch
+
         from scope_rx import ScopeRX
-        from scope_rx.utils import preprocess_image, load_image
+        from scope_rx.utils import load_image, preprocess_image
         from scope_rx.visualization import plot_comparison
-        
+
         # Load model
         model = load_model(args.model)
-        
+
         # Load and preprocess image
         original_image = load_image(args.image, size=(224, 224))
         input_tensor = preprocess_image(args.image)
-        
+
         # Ensure tensor type
         if not isinstance(input_tensor, torch.Tensor):
             input_tensor = torch.from_numpy(input_tensor).float()
-        
+
         # Create explainer
         scope = ScopeRX(model)
-        
+
         # Parse methods
         methods = [m.strip() for m in args.methods.split(',')]
-        
+
         # Generate explanations
         results = scope.compare_methods(
             input_tensor,
             methods=methods,
             target_class=args.target_class
         )
-        
+
         # Extract attributions
         attributions = {name: r.attribution for name, r in results.results.items()}
-        
+
         print(f"Compared methods: {', '.join(methods)}")
-        
+
         # Visualize
         if not args.no_display:
             plot_comparison(
@@ -267,9 +269,9 @@ def cmd_compare(args):
                 show=False
             )
             print(f"Saved to: {args.output}")
-        
+
         return 0
-        
+
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         return 1
@@ -279,7 +281,7 @@ def cmd_list_methods(args):
     """List available methods."""
     print("Available explanation methods:")
     print("-" * 40)
-    
+
     # Use static list of available methods
     methods = [
         'gradcam', 'gradcam++', 'scorecam', 'layercam',
@@ -287,36 +289,36 @@ def cmd_list_methods(args):
         'guided_backprop', 'occlusion', 'rise', 'meaningful_perturbation',
         'kernel_shap', 'lime', 'attention_rollout', 'attention_flow'
     ]
-    
+
     categories = {
-        "Gradient-based": ["gradcam", "gradcam++", "scorecam", "layercam", 
-                          "smoothgrad", "integrated_gradients", "vanilla", 
+        "Gradient-based": ["gradcam", "gradcam++", "scorecam", "layercam",
+                          "smoothgrad", "integrated_gradients", "vanilla",
                           "guided_backprop"],
         "Perturbation-based": ["occlusion", "rise", "meaningful_perturbation"],
         "Model-agnostic": ["kernel_shap", "lime"],
         "Attention-based": ["attention_rollout", "attention_flow", "raw_attention"],
     }
-    
+
     for category, method_list in categories.items():
         print(f"\n{category}:")
         for method in method_list:
             if method in methods:
                 print(f"  - {method}")
-    
+
     return 0
 
 
 def cmd_show_layers(args):
     """Show model layers."""
     model = load_model(args.model)
-    
+
     print(f"Layers in {args.model}:")
     print("-" * 40)
-    
+
     for name, module in model.named_modules():
         if name:
             print(f"  {name}: {module.__class__.__name__}")
-    
+
     return 0
 
 
@@ -324,13 +326,13 @@ def load_model(model_name: str):
     """Load a model by name or path."""
     import torch
     import torchvision.models as models  # type: ignore[import-not-found]
-    
+
     # Check if it's a file path
     if Path(model_name).exists():
         model = torch.load(model_name, weights_only=False)
         model.eval()
         return model
-    
+
     # Check if it's a torchvision model
     model_fn = getattr(models, model_name, None)
     if model_fn is not None:
@@ -342,7 +344,7 @@ def load_model(model_name: str):
             model = model_fn(pretrained=True)
         model.eval()
         return model
-    
+
     raise ValueError(
         f"Unknown model: {model_name}. "
         "Use a torchvision model name (e.g., resnet50) or path to saved model."

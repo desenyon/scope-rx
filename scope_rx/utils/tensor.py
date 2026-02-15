@@ -2,7 +2,7 @@
 Tensor conversion utilities.
 """
 
-from typing import Union, Optional
+from typing import Optional, Union
 
 import numpy as np
 import torch
@@ -10,10 +10,10 @@ import torch
 
 def to_numpy(tensor: Union[np.ndarray, torch.Tensor]) -> np.ndarray:
     """Convert tensor to numpy array.
-    
+
     Args:
         tensor: PyTorch tensor or numpy array.
-        
+
     Returns:
         Numpy array.
     """
@@ -27,11 +27,11 @@ def to_tensor(
     device: Optional[torch.device] = None
 ) -> torch.Tensor:
     """Convert array to PyTorch tensor.
-    
+
     Args:
         array: Numpy array or tensor.
         device: Target device.
-        
+
     Returns:
         PyTorch tensor.
     """
@@ -39,19 +39,19 @@ def to_tensor(
         tensor = array
     else:
         tensor = torch.from_numpy(np.array(array))
-    
+
     if device is not None:
         tensor = tensor.to(device)
-    
+
     return tensor
 
 
 def ensure_4d(tensor: torch.Tensor) -> torch.Tensor:
     """Ensure tensor is 4D (N, C, H, W).
-    
+
     Args:
         tensor: Input tensor.
-        
+
     Returns:
         4D tensor.
     """

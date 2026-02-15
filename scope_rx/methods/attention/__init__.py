@@ -7,9 +7,9 @@ This module provides attention-based attribution methods including:
 - Raw Attention
 """
 
-from scope_rx.methods.attention.rollout import AttentionRollout
 from scope_rx.methods.attention.flow import AttentionFlow
 from scope_rx.methods.attention.raw import RawAttention
+from scope_rx.methods.attention.rollout import AttentionRollout
 
 __all__ = [
     "AttentionRollout",

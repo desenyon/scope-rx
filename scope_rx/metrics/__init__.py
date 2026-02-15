@@ -9,21 +9,19 @@ This module provides metrics to evaluate the quality of explanations:
 """
 
 from scope_rx.metrics.faithfulness import (
-    insertion_deletion_auc,
-    faithfulness_score,
     aopc_score,
+    faithfulness_score,
+    insertion_deletion_auc,
     sufficiency_score,
 )
-
 from scope_rx.metrics.sensitivity import (
-    sensitivity_score,
-    max_sensitivity,
     avg_sensitivity,
+    max_sensitivity,
+    sensitivity_score,
 )
-
 from scope_rx.metrics.stability import (
-    stability_score,
     explanation_consistency,
+    stability_score,
 )
 
 __all__ = [
@@ -32,12 +30,12 @@ __all__ = [
     "faithfulness_score",
     "aopc_score",
     "sufficiency_score",
-    
+
     # Sensitivity
     "sensitivity_score",
     "max_sensitivity",
     "avg_sensitivity",
-    
+
     # Stability
     "stability_score",
     "explanation_consistency",
