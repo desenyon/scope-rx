@@ -6,6 +6,7 @@ linear regression approach.
 """
 
 from __future__ import annotations
+
 from typing import Optional, Tuple
 
 import numpy as np

@@ -6,8 +6,8 @@ https://arxiv.org/abs/1806.07421
 """
 
 from __future__ import annotations
-import math
-from typing import TYPE_CHECKING, Any, List, Optional, Tuple, Union
+
+from typing import Optional, Tuple
 
 import numpy as np
 import torch
