@@ -2,9 +2,15 @@
 
 **Neural Network Explainability and Interpretability Library**
 
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![PyPI version](https://badge.fury.io/py/scope-rx.svg)](https://badge.fury.io/py/scope-rx)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![CI](https://github.com/xcalen/scope-rx/actions/workflows/ci.yml/badge.svg)](https://github.com/xcalen/scope-rx/actions/workflows/ci.yml) [![Codecov](https://codecov.io/gh/xcalen/scope-rx/branch/main/graph/badge.svg)](https://codecov.io/gh/xcalen/scope-rx)
 
-ScopeRX is a comprehensive Python library for explaining and interpreting neural network predictions. It provides state-of-the-art attribution methods, evaluation metrics, and visualization tools - all unified under a simple, intuitive API.
+ScopeRX is a comprehensive, production-grade Python library for explaining and interpreting neural network predictions. It provides state-of-the-art attribution methods, evaluation metrics, and visualization tools - all unified under a simple, intuitive API.
+
+## Version 2.0.0 Updates
+- **Type Safety**: Fully typed codebase with `mypy` compliance.
+- **Production Grade**: Enhanced stability, error handling, and performance optimizations.
+- **CI/CD**: Automated testing and linting pipelines.
+- **Improved Methods**: Refactored `KernelSHAP`, `RISE`, and Attention methods for better accuracy and speed.
 
 ## Features
 
