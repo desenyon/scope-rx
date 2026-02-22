@@ -12,6 +12,17 @@ ScopeRX is a comprehensive, production-grade Python library for explaining and i
 - **CI/CD**: Automated testing and linting pipelines.
 - **Improved Methods**: Refactored `KernelSHAP`, `RISE`, and Attention methods for better accuracy and speed.
 
+### Bug Fixes (post-2.0.0)
+- **`torchvision` promoted to core dependency** — no longer requires `pip install scope-rx[full]`.
+- **`KernelSHAP` / `LIME`**: Fixed all-zero attributions on images where SLIC collapses to a single
+  superpixel (synthetic or low-complexity images). A uniform grid is used as a fallback, and
+  prediction labels are scaled before Ridge regression so small confidence ranges don't zero out coefficients.
+- **`GuidedBackprop`**: Input tensor is now cloned before enabling `requires_grad`, preventing
+  accidental mutation of the caller's tensor.
+- **`MeaningfulPerturbation`**: Validated input tensor is detached before optimization to avoid gradient graph conflicts.
+- **Metrics**: `faithfulness.aopc_score` returns a writeable NumPy array (`.copy()` on reversed argsort);
+  `sensitivity.max_sensitivity` always returns a Python `float`.
+
 ## Features
 
 - **15+ Explanation Methods**: From classic GradCAM to cutting-edge RISE and attention methods
@@ -37,9 +48,11 @@ pip install scope-rx[interactive]
 # For development
 pip install scope-rx[dev]
 
-# Full installation with all extras
+# Full installation with all extras (transformers, SHAP, captum)
 pip install scope-rx[full]
 ```
+
+> **Note:** `torchvision` is a core dependency and is installed automatically with `pip install scope-rx`.
 
 ## Quick Start
 
@@ -247,7 +260,10 @@ result = smoothgrad.explain(input_tensor, target_class=0)
 ## Testing
 
 ```bash
-# Run all tests
+# Run the comprehensive end-to-end test suite (CLI + Python API + metrics + visualization)
+python test/test_everything.py
+
+# Run unit tests with pytest
 pytest tests/
 
 # Run with coverage
