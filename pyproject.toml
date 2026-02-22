@@ -48,6 +48,7 @@ classifiers = [
 requires-python = ">=3.9"
 dependencies = [
     "torch>=1.10.0",
+    "torchvision>=0.12.0",
     "numpy>=1.21.0",
     "matplotlib>=3.5.0",
     "opencv-python>=4.5.0",
@@ -78,7 +79,6 @@ full = [
     "shap>=0.42.0",
     "lime>=0.2.0",
     "captum>=0.6.0",
-    "torchvision>=0.12.0",
     "transformers>=4.20.0",
 ]
 docs = [
