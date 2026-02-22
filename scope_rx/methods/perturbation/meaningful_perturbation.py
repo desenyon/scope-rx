@@ -83,7 +83,7 @@ class MeaningfulPerturbation(BaseExplainer):
         Returns:
             ExplanationResult with the optimized mask.
         """
-        input_tensor = self._validate_input(input_tensor)
+        input_tensor = self._validate_input(input_tensor).detach()
         input_shape = input_tensor.shape
         _, _, height, width = input_shape
 
