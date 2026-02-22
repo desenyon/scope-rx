@@ -52,7 +52,7 @@ Attention-based:
     - RawAttention
 """
 
-__version__ = "2.0.0"
+__version__ = "2.0.1"
 __author__ = "desenyon"
 __email__ = "desenyon@gmail.com"
 __license__ = "MIT"

@@ -6,22 +6,21 @@
 
 ScopeRX is a comprehensive, production-grade Python library for explaining and interpreting neural network predictions. It provides state-of-the-art attribution methods, evaluation metrics, and visualization tools - all unified under a simple, intuitive API.
 
-## Version 2.0.0 Updates
+## What's New
+
+### v2.0.1
+- **`torchvision` promoted to core dependency** — no longer requires `pip install scope-rx[full]`.
+- **`KernelSHAP` / `LIME`**: Fixed all-zero attributions on low-complexity images (SLIC grid fallback + Ridge label scaling).
+- **`GuidedBackprop`**: Input tensor is cloned before `requires_grad`, preventing mutation of caller's tensor.
+- **`MeaningfulPerturbation`**: Validated input detached before optimisation to avoid gradient graph conflicts.
+- **Metrics**: `aopc_score` returns a writeable array; `max_sensitivity` always returns a plain `float`.
+- **Tests**: New end-to-end integration suite (`test/test_everything.py`) with correctness assertions for all 15 methods.
+
+### v2.0.0
 - **Type Safety**: Fully typed codebase with `mypy` compliance.
 - **Production Grade**: Enhanced stability, error handling, and performance optimizations.
 - **CI/CD**: Automated testing and linting pipelines.
 - **Improved Methods**: Refactored `KernelSHAP`, `RISE`, and Attention methods for better accuracy and speed.
-
-### Bug Fixes (post-2.0.0)
-- **`torchvision` promoted to core dependency** — no longer requires `pip install scope-rx[full]`.
-- **`KernelSHAP` / `LIME`**: Fixed all-zero attributions on images where SLIC collapses to a single
-  superpixel (synthetic or low-complexity images). A uniform grid is used as a fallback, and
-  prediction labels are scaled before Ridge regression so small confidence ranges don't zero out coefficients.
-- **`GuidedBackprop`**: Input tensor is now cloned before enabling `requires_grad`, preventing
-  accidental mutation of the caller's tensor.
-- **`MeaningfulPerturbation`**: Validated input tensor is detached before optimization to avoid gradient graph conflicts.
-- **Metrics**: `faithfulness.aopc_score` returns a writeable NumPy array (`.copy()` on reversed argsort);
-  `sensitivity.max_sensitivity` always returns a Python `float`.
 
 ## Features
 
