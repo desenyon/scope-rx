@@ -65,11 +65,17 @@ class KernelSHAP(BaseExplainer):
         self,
         input_tensor: torch.Tensor
     ) -> np.ndarray:
-        """Segment image into superpixels using SLIC."""
+        """Segment image into superpixels using SLIC, with a grid fallback.
+
+        SLIC can collapse to 1 segment on images with simple periodic structure
+        (e.g. solid colours, synthetic patterns).  When that happens we fall
+        back to a uniform rectangular grid so that the subsequent regression
+        always has at least ``num_segments`` meaningful features.
+        """
         from skimage.segmentation import slic  # type: ignore[import-not-found]
 
         # Convert to numpy image
-        image = input_tensor.squeeze().cpu().numpy()
+        image = input_tensor.squeeze().detach().cpu().numpy()
         if image.ndim == 3 and image.shape[0] in [1, 3]:
             image = np.transpose(image, (1, 2, 0))
 
@@ -85,6 +91,27 @@ class KernelSHAP(BaseExplainer):
             compactness=10,
             start_label=0
         )
+
+        # ---------- fallback: uniform grid ---------------------------------
+        # SLIC may produce far fewer segments than requested (e.g. 1) on
+        # images with low spatial complexity. Fall back to a rectangular grid
+        # whenever the actual segment count is less than half the requested one.
+        min_acceptable = max(4, self.num_segments // 2)
+        actual_segments = int(segments.max()) + 1
+        if actual_segments < min_acceptable:
+            h, w = image.shape[:2]
+            n = int(np.ceil(np.sqrt(self.num_segments)))
+            grid = np.zeros((h, w), dtype=np.int32)
+            row_edges = np.linspace(0, h, n + 1, dtype=int)
+            col_edges = np.linspace(0, w, n + 1, dtype=int)
+            seg_id = 0
+            for r in range(n):
+                for c in range(n):
+                    grid[row_edges[r]:row_edges[r + 1],
+                         col_edges[c]:col_edges[c + 1]] = seg_id
+                    seg_id += 1
+            segments = grid
+        # -------------------------------------------------------------------
 
         return np.asarray(segments)
 
@@ -292,8 +319,19 @@ class KernelSHAP(BaseExplainer):
         # Normalize weights
         weights = weights / weights.max()
 
-        # Fit ridge regression
+        # Scale predictions to [0, 1] so that Ridge regularisation (which
+        # pushes coefficients toward zero) doesn't collapse to all-zeros when
+        # the raw prediction range is very small (e.g. low-confidence input).
+        pred_min, pred_max = predictions.min(), predictions.max()
+        pred_range = pred_max - pred_min
+        if pred_range > 1e-10:
+            predictions_scaled = (predictions - pred_min) / pred_range
+        else:
+            # Model is genuinely insensitive to all masking → no useful SHAP signal.
+            return np.zeros(num_segments)
+
+        # Fit ridge regression on the scaled targets.
         model = Ridge(alpha=0.01, fit_intercept=True)
-        model.fit(coalitions, predictions, sample_weight=weights)
+        model.fit(coalitions, predictions_scaled, sample_weight=weights)
 
         return np.asarray(model.coef_)

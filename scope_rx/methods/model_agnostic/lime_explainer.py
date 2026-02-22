@@ -62,10 +62,16 @@ class LIME(BaseExplainer):
         self.kernel_width = kernel_width
 
     def _segment_image(self, input_tensor: torch.Tensor) -> np.ndarray:
-        """Segment image into superpixels."""
+        """Segment image into superpixels, with a uniform-grid fallback.
+
+        SLIC may produce far fewer segments than requested on images with low
+        spatial complexity (e.g. synthetic/periodic patterns).  In that case we
+        substitute a uniform rectangular grid so the linear model always has
+        at least ``num_segments`` features to work with.
+        """
         from skimage.segmentation import slic  # type: ignore[import-not-found]
 
-        image = input_tensor.squeeze().cpu().numpy()
+        image = input_tensor.squeeze().detach().cpu().numpy()
         if image.ndim == 3 and image.shape[0] in [1, 3]:
             image = np.transpose(image, (1, 2, 0))
 
@@ -79,6 +85,24 @@ class LIME(BaseExplainer):
             compactness=10,
             start_label=0
         )
+
+        # ---------- fallback: uniform grid ---------------------------------
+        min_acceptable = max(4, self.num_segments // 2)
+        actual_segments = int(segments.max()) + 1
+        if actual_segments < min_acceptable:
+            h, w = image.shape[:2]
+            n = int(np.ceil(np.sqrt(self.num_segments)))
+            grid = np.zeros((h, w), dtype=np.int32)
+            row_edges = np.linspace(0, h, n + 1, dtype=int)
+            col_edges = np.linspace(0, w, n + 1, dtype=int)
+            seg_id = 0
+            for r in range(n):
+                for c in range(n):
+                    grid[row_edges[r]:row_edges[r + 1],
+                         col_edges[c]:col_edges[c + 1]] = seg_id
+                    seg_id += 1
+            segments = grid
+        # -------------------------------------------------------------------
 
         return np.asarray(segments)
 
@@ -194,8 +218,10 @@ class LIME(BaseExplainer):
             iterator = tqdm(iterator, desc="LIME")
 
         for _ in iterator:
-            # Random binary mask
-            num_active = np.random.randint(1, num_segments)
+            # Random binary mask – guard against num_segments == 1
+            high = max(2, num_segments)
+            num_active = np.random.randint(1, high)
+            num_active = min(num_active, num_segments)  # never exceed actual count
             active_segments = np.random.choice(
                 num_segments, num_active, replace=False
             )
@@ -245,6 +271,16 @@ class LIME(BaseExplainer):
         weights: np.ndarray
     ) -> np.ndarray:
         """Fit linear model to weighted samples."""
+        # Scale labels to [0, 1] so Ridge regularisation doesn't collapse
+        # coefficients to zero when the raw label range is very small
+        # (e.g. a low-confidence prediction on a synthetic image).
+        label_min, label_max = labels.min(), labels.max()
+        label_range = label_max - label_min
+        if label_range > 1e-10:
+            labels_scaled = (labels - label_min) / label_range
+        else:
+            labels_scaled = labels  # truly constant; coefs will be ~0 anyway
+
         model = Ridge(alpha=1, fit_intercept=True, random_state=42)
-        model.fit(data, labels, sample_weight=weights)
+        model.fit(data, labels_scaled, sample_weight=weights)
         return np.asarray(model.coef_)
