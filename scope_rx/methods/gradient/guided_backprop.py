@@ -93,15 +93,17 @@ class GuidedBackprop(BaseExplainer):
 
         try:
             # Compute gradients with guided backprop
-            input_tensor.requires_grad = True
+            # Clone + detach so we never mutate the caller's tensor
+            input_grad = input_tensor.detach().clone()
+            input_grad.requires_grad_(True)
             self.model.zero_grad()
 
-            output = self.model(input_tensor)
+            output = self.model(input_grad)
             score = output[:, target_class]
             score.backward()
 
-            assert input_tensor.grad is not None, "Gradients not computed"
-            gradients = input_tensor.grad.detach().squeeze().cpu().numpy()
+            assert input_grad.grad is not None, "Gradients not computed"
+            gradients = input_grad.grad.detach().squeeze().cpu().numpy()
         finally:
             # Remove hooks
             for handle in handles:
