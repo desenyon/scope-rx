@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "scope-rx"
-version = "2.0.1"
+version = "3.0.0"
 description = "A comprehensive neural network explainability and interpretability library"
 readme = "README.md"
 license = {text = "MIT"}
@@ -147,27 +147,3 @@ warn_return_any = true
 warn_unused_configs = true
 ignore_missing_imports = true
 strict_optional = true
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-addopts = "-v --cov=scope_rx --cov-report=term-missing"
-filterwarnings = [
-    "ignore::DeprecationWarning",
-    "ignore::UserWarning",
-]
-
-[tool.coverage.run]
-source = ["scope_rx"]
-branch = true
-omit = ["tests/*", "setup.py"]
-
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "raise NotImplementedError",
-    "if TYPE_CHECKING:",
-]
