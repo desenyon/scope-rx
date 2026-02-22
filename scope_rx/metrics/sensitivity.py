@@ -101,7 +101,7 @@ def max_sensitivity(
         distance = np.sqrt(np.mean((original_attr - noisy_attr) ** 2))
         max_distance = max(max_distance, distance)
 
-    return max_distance
+    return float(max_distance)
 
 
 def avg_sensitivity(

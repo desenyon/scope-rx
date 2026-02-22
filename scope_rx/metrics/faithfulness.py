@@ -187,7 +187,7 @@ def aopc_score(
 
     # Flatten and sort attribution
     attr_flat = attribution.flatten()
-    sorted_indices = np.argsort(attr_flat)[::-1]
+    sorted_indices = np.argsort(attr_flat)[::-1].copy()
 
     drops = []
 
