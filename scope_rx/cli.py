@@ -165,8 +165,11 @@ def cmd_explain(args):
         from scope_rx.utils import load_image, preprocess_image
         from scope_rx.visualization import export_visualization, plot_attribution
 
-        # Load model
-        model = load_model(args.model)
+        # Load model with cleaner error handling
+        try:
+            model = load_model(args.model)
+        except Exception as model_err:
+            raise RuntimeError(f"Failed to load model '{args.model}': {model_err}")
 
         # Load and preprocess image
         original_image = load_image(args.image, size=(224, 224))
@@ -225,8 +228,11 @@ def cmd_compare(args):
         from scope_rx.utils import load_image, preprocess_image
         from scope_rx.visualization import plot_comparison
 
-        # Load model
-        model = load_model(args.model)
+        # Load model with cleaner error handling
+        try:
+            model = load_model(args.model)
+        except Exception as model_err:
+            raise RuntimeError(f"Failed to load model '{args.model}': {model_err}")
 
         # Load and preprocess image
         original_image = load_image(args.image, size=(224, 224))
@@ -310,7 +316,11 @@ def cmd_list_methods(args):
 
 def cmd_show_layers(args):
     """Show model layers."""
-    model = load_model(args.model)
+    try:
+        model = load_model(args.model)
+    except Exception as model_err:
+        print(f"Error: Failed to load model '{args.model}': {model_err}", file=sys.stderr)
+        return 1
 
     print(f"Layers in {args.model}:")
     print("-" * 40)
