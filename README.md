@@ -310,3 +310,78 @@ ScopeRX builds upon the excellent work of the interpretability research communit
 ---
 
 **Made with love by Desenyon**
+
+<!-- architecture-atlas-v5:start -->
+## Architecture Atlas v5
+
+These editable Mermaid diagrams mirror the [Notion architecture dossier](https://app.notion.com/p/3b467342e8c181618ac2e87773d3e302?pvs=204).
+
+### 1. Library anatomy
+
+```mermaid
+flowchart LR
+  API["ScopeRX facade / CLI"] --> REG["Method registry + validation"]
+  REG --> TARGET["Model adapter + target-layer resolver"]
+  TARGET --> GRAD["Gradient family<br>GradCAM, ++, LayerCAM, SmoothGrad, IG, Guided BP"]
+  TARGET --> PERT["Perturbation family<br>Occlusion, RISE, Meaningful Perturbation"]
+  TARGET --> AGN["Model-agnostic family<br>KernelSHAP, LIME"]
+  TARGET --> ATT["Attention family<br>rollout, flow, raw attention"]
+  GRAD --> RESULT["Typed ExplanationResult"]
+  PERT --> RESULT
+  AGN --> RESULT
+  ATT --> RESULT
+  RESULT --> METRIC["Faithfulness, insertion/deletion, sensitivity, stability"]
+  RESULT --> VIZ["Overlay, comparison, Plotly, image/NumPy export"]
+```
+
+### 2. Component wiring
+
+```mermaid
+flowchart TB
+  INPUT["Input tensor + model + target class"] --> VALID["Shape, device, dtype, model-mode validation"]
+  VALID --> METHOD{"Selected explanation method"}
+  METHOD --> HOOK["Install scoped hooks / gradient controls"]
+  HOOK --> RUN["Forward and method-specific backward or perturbation loop"]
+  RUN --> CLEAN["Remove hooks; restore caller tensor and model state"]
+  CLEAN --> NORM["Normalize attribution; retain raw map + metadata"]
+  NORM --> RESULT["ExplanationResult"]
+  RESULT --> QUALITY["Quantitative explanation metrics"]
+  RESULT --> DISPLAY["Static / interactive visualization"]
+  QUALITY -. detects persuasive but unfaithful maps .-> RESULT
+```
+
+### 3. Explanation narrative
+
+```mermaid
+sequenceDiagram
+  actor User
+  participant F as ScopeRX facade
+  participant A as Model adapter
+  participant E as Explainer
+  participant M as Metrics
+  participant V as Visualization
+  User->>F: explain(input, method, target_class, target_layer)
+  F->>A: validate model, layer, tensor, device and mode
+  A->>E: bound forward/backward or perturbation contract
+  E->>E: generate attribution and clean temporary hooks
+  E-->>F: typed result with method metadata
+  User->>M: evaluate attribution
+  M->>A: insertion/deletion, sensitivity, stability probes
+  M-->>User: numerical quality evidence
+  User->>V: overlay, compare, interact, or export
+```
+
+### 4. Reliability model
+
+```mermaid
+stateDiagram-v2
+  [*] --> CONFIGURED
+  CONFIGURED --> INPUT_VALIDATED --> HOOKS_INSTALLED --> FORWARD_PASS
+  FORWARD_PASS --> BACKWARD_OR_PERTURBATION --> ATTRIBUTION_READY --> HOOKS_REMOVED
+  HOOKS_REMOVED --> METRICS_COMPUTED --> EXPORTED
+  INPUT_VALIDATED --> REJECTED: invalid layer, tensor, or method
+  BACKWARD_OR_PERTURBATION --> FAILED: numerical or model failure
+  FAILED --> HOOKS_REMOVED: cleanup guarantee
+```
+
+<!-- architecture-atlas-v5:end -->
